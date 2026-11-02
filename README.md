@@ -1,4 +1,4 @@
-# AutomataLab — Phase 4
+# AutoPixel
 
 Includes Phases 1–3 plus epsilon-NFA to DFA conversion using subset construction.
 
