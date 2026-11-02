@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AutoPixel — Build to Level Up</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script defer src="https://unpkg.com/cytoscape@3.30.4/dist/cytoscape.min.js"></script>
+    <script defer src="{{ url_for('static', filename='js/app.js') }}"></script>
+</head>
+
+<body>
+    <div id="title" role="dialog" aria-label="Title screen"><i class="sp cloud c1"></i><i class="sp cloud c2"></i><i
+            class="sp cloud c3"></i><i class="sp star s1"></i><i class="sp star s2"></i><i class="sp star s3"></i><i
+            class="sp coin k1"></i><i class="sp coin k2"></i><i class="sp lamp"></i><i class="sp hero"></i><i
+            class="sp cat"></i>
+        <div class="stars">★ ✦ ★ ✦ ★</div>
+        <h1><small>2026</small>AUTOMATA<br>QUEST</h1>
+        <p>Build DFAs &amp; NFAs. Beat the missions. Level up!</p><button id="startBtn" class="primary">START</button>
+        <div class="ground"><span>★ MISSIONS ★ MISSIONS ★ MISSIONS ★ MISSIONS ★ MISSIONS ★ MISSIONS ★ MISSIONS ★
+                MISSIONS</span></div>
+    </div>
+    <header>
+        <div class="brand"><span class="logo">◎</span><strong>AutoPixel</strong><span class="subtitle">Finite Automata
+                Workspace</span></div>
+        <div id="hud"><span id="hudXp">XP 0</span><span id="hudLv">LV 1</span><span id="hudHearts">♥♥♥</span></div>
+        <div class="header-actions"><button id="loadBtn">Import JSON</button><button id="saveBtn" class="primary">Export
+                JSON</button><input type="file" id="fileInput" accept=".json,application/json" hidden></div>
+    </header>
+    <main>
+        <aside>
+            <h3>Missions</h3>
+            <div id="missionGrid" role="group" aria-label="Missions"></div><select id="missionSelect" hidden></select>
+            <div id="missionText" class="sim-result"></div><button id="checkBtn" class="primary">⚔ Submit
+                answer</button>
+            <div id="missionResult" class="sim-result" aria-live="polite">Pick a mission, build the machine, then
+                submit.</div>
+            <h3>Automaton</h3><label for="type">Machine type</label><select id="type">
+                <option>DFA</option>
+                <option>NFA</option>
+            </select>
+            <h3>Example automata</h3><select id="exampleSelect" aria-label="Choose example">
+                <option value="ends-a">DFA: ends in a</option>
+                <option value="even-ones">DFA: even number of 1s</option>
+                <option value="epsilon">NFA: epsilon + a*</option>
+            </select><button id="loadExampleBtn">Load example</button>
+            <h3>Tools</h3><button class="tool active" data-tool="select">↖ Select / Move</button><button class="tool"
+                data-tool="state">⊕ Add state</button><button class="tool" data-tool="edge">↗ Add
+                transition</button><button class="tool" data-tool="delete">× Delete</button>
+            <div class="hint">Add state: click empty canvas.<br>Transition: click source, then target.<br>Double-click a
+                state to edit its properties.</div>
+            <h3>Selected state</h3>
+            <div id="properties" class="muted">Select a state to edit it.</div>
+            <h3>Regex → NFA</h3><label for="regexInput">Regular expression</label><input id="regexInput" type="text"
+                value="(a|b)*abb" placeholder="(a|b)*abb" autocomplete="off">
+            <div class="hint">Supports | (union), implicit concatenation, *, +, ?, parentheses and ε. Single-character
+                symbols.</div><button id="regexBtn" class="primary">Generate NFA</button>
+            <div id="regexResult" class="sim-result" aria-live="polite">Generate a Thompson ε-NFA from a regex.</div>
+            <h3>NFA → DFA</h3>
+            <div class="hint">Convert the current NFA using ε-closure and subset construction. Your NFA is preserved for
+                comparison.</div><button id="convertDfaBtn" class="primary">Convert NFA to DFA</button><button
+                id="restoreNfaBtn" disabled>Restore original NFA</button>
+            <div id="conversionResult" class="sim-result" aria-live="polite">Conversion results appear here.</div>
+            <div id="conversionTable" class="conversion-table"></div>
+            <h3>Simulator</h3><label for="inputString">Input string</label><input id="inputString" type="text"
+                placeholder="e.g. abba" autocomplete="off"><button id="runBtn" class="primary">▶ Run simulation</button>
+            <div class="sim-controls"><button id="prevBtn">← Previous</button><button id="nextBtn">Next
+                    →</button><button id="resetBtn">Reset</button></div>
+            <div class="playback"><button id="playBtn" class="primary">▶ Auto play</button><label
+                    for="speedSelect">Speed</label><select id="speedSelect">
+                    <option value="1100">Slow</option>
+                    <option value="650" selected>Normal</option>
+                    <option value="300">Fast</option>
+                </select></div>
+            <div id="simResult" class="sim-result" aria-live="polite">Run a simulation to see the trace.</div>
+            <div id="trace" class="trace"></div>
+            <h3>Actions</h3><button id="validateBtn">Validate structure</button><button id="fitBtn">Fit
+                graph</button><button id="clearBtn" class="danger">Clear canvas</button>
+        </aside>
+        <section class="workspace">
+            <div class="workspace-head">
+                <div>
+                    <h2>State diagram</h2>
+                    <p>Create states and connect them with labeled transitions.</p>
+                </div><span id="stats">0 states · 0 transitions</span>
+            </div>
+            <div class="canvas-tools"><span>Click a state to inspect · Drag to reposition</span>
+                <div><button id="zoomInBtn" aria-label="Zoom in">＋</button><button id="zoomOutBtn"
+                        aria-label="Zoom out">－</button><button id="centerBtn">Center</button></div>
+            </div>
+            <div id="cy"></div>
+            <div class="keyboard-hint">Shortcuts: <kbd>V</kbd> select · <kbd>S</kbd> state · <kbd>T</kbd> transition ·
+                <kbd>F</kbd> final · <kbd>I</kbd> start · <kbd>Delete</kbd> remove selection · <kbd>Space</kbd> next
+                simulation step
+            </div>
+            <div class="status" id="status" role="status">Ready. Select a tool to begin.</div>
+        </section>
+    </main>
+</body>
+
+</html>

@@ -1,0 +1,12 @@
+{
+  "type": "DFA",
+  "states": [
+    {"id":"q0","label":"q0","initial":true,"accepting":false,"position":{"x":180,"y":180}},
+    {"id":"q1","label":"q1","initial":false,"accepting":true,"position":{"x":420,"y":180}}
+  ],
+  "transitions": [
+    {"id":"e0","source":"q0","target":"q1","label":"a"},
+    {"id":"e1","source":"q0","target":"q0","label":"b"},
+    {"id":"e2","source":"q1","target":"q1","label":"a,b"}
+  ]
+}
